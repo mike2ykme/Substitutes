@@ -42,4 +42,8 @@ public class Controller {
     public List<Substitute> getAllSubstitutes() {
         return this.substituteRepo.getAllSubstitutes();
     }
+
+    public Substitute addSubstitute(Substitute sub) {
+        return this.substituteRepo.addSubstitute(sub);
+    }
 }

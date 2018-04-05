@@ -12,16 +12,21 @@ public class Substitute {
     private HolidayAvailability holidayAvailability;
     private Availability regularAvailability;
 
-//    public boolean avaiableAtStart(LocalDateTime start) {
-////        return ((this.holidayAvailability.inList(start)));
-//        return !this.holidayAvailability.inList(start) && this.regularAvailability.available()
-//    }
-//
-//    public boolean availableUntilEnd(LocalDateTime end) {
-//        return false;
-//    }
+    public Substitute() {
+    }
 
-    public boolean avaiableFor(LocalDateTime start, LocalDateTime end) {
-        return !this.holidayAvailability.inList(start) && this.regularAvailability.available(start,end);
+    public Substitute(long id, String name, String contactNumber, String address,
+                      HolidayAvailability holidayAvailability, Availability regularAvailability) {
+        this.id = id;
+        this.name = name;
+        this.contactNumber = contactNumber;
+        this.address = address;
+        this.holidayAvailability = holidayAvailability;
+        this.regularAvailability = regularAvailability;
+    }
+
+
+    public boolean isAvailableOn(LocalDateTime start, LocalDateTime end) {
+        return !this.holidayAvailability.isHolidayScheduled(start) && this.regularAvailability.isAvailable(start,end);
     }
 }

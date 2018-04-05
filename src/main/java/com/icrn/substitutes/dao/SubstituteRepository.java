@@ -8,4 +8,6 @@ import java.util.List;
 public interface SubstituteRepository {
     List<Substitute> getSubstitutesAvailableForTime(LocalDateTime start, LocalDateTime end);
     List<Substitute> getAllSubstitutes();
+
+    Substitute addSubstitute(Substitute sub);
 }

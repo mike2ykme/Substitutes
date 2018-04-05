@@ -1,18 +1,37 @@
 package com.icrn.substitutes.model;
 
+import lombok.Data;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
+import java.util.HashSet;
+import java.util.Set;
+@Data
 public class HolidayAvailability {
-    private Map<String,Boolean> availabilityMap = new ConcurrentHashMap<>();
 
-    public boolean inList(LocalDateTime date) {
-        return this.inList(LocalDate.of(date.getYear(),date.getMonth(),date.getDayOfMonth()));
+    private Set<String> availability;
+
+    public HolidayAvailability(Set<String> availability) {
+        this.availability = availability;
     }
 
-    public boolean inList(LocalDate date) {
-        return availabilityMap.containsKey(date.toString());
+    public boolean isHolidayScheduled(LocalDateTime date) {
+        return this.isHolidayScheduled(LocalDate.of(date.getYear(),date.getMonth(),date.getDayOfMonth()));
+    }
+
+    public HolidayAvailability() {
+        this.availability = new HashSet<>();
+    }
+
+    public boolean isHolidayScheduled(LocalDate date) {
+        return this.availability.contains(date.toString());
+    }
+
+    public boolean addHoliday(LocalDate day){
+        return this.availability.add(day.toString());
+    }
+
+    public boolean removeHoliday(LocalDate day){
+        return this.availability.remove(day.toString());
     }
 }

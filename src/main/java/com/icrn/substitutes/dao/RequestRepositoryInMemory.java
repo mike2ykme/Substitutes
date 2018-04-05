@@ -37,7 +37,7 @@ public class RequestRepositoryInMemory implements RequestRepository {
     @Override
     public Request saveRequest(Request request) {
         if (request.getRequestId() == 0)
-            request.setRequestId(new Random().nextLong());
+            request.setRequestId(Math.abs(new Random().nextLong()));
         this.requestMap.put(request.getRequestId(),request);
         return request;
     }

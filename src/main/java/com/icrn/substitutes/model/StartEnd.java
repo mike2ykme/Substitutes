@@ -8,4 +8,10 @@ import java.time.LocalTime;
 public class StartEnd {
     private LocalTime start;
     private LocalTime end;
+
+    public StartEnd(LocalTime start, LocalTime end) {
+        this.start= start;
+        this.end = end;
+    }
+
 }
