@@ -38,8 +38,7 @@ public class Controller {
     public Optional<Request> getRequestByRequestId(long requestId) {
         return this.requestRepo.getRequestById(requestId);
     }
-    public List<Substitute> getSubstitutesAvailableOnDateTime(LocalDateTime start,
-                                                              LocalDateTime end) {
+    public List<Substitute> getSubstitutesAvailableOnDateTime(LocalDateTime start,LocalDateTime end) {
         return this.substituteRepo.getSubstitutesAvailableForTime(start,end);
     }
     public List<Substitute> getAllSubstitutes() {

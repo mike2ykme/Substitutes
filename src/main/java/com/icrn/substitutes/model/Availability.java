@@ -20,8 +20,8 @@ public class Availability {
 
     //http://www.java2s.com/Tutorials/Java/Data_Type_How_to/Date/Get_day_of_week_int_value_and_String_value.htm
     public boolean isAvailable(LocalDateTime start, LocalDateTime end) {
-        if (start.getDayOfWeek() != end.getDayOfWeek())
-            throw new RuntimeException("Days must be same date");
+        if (start.getDayOfMonth() != end.getDayOfMonth())
+            throw new IllegalArgumentException("Days must be same date");
 
         StartEnd startEnd = this.mapAvailability.get(start.getDayOfWeek().getValue());
         if (startEnd != null){
@@ -34,4 +34,6 @@ public class Availability {
     public StartEnd addAvailabilityTime(int dayOfWeek, StartEnd startEnd){
         return this.mapAvailability.put(dayOfWeek,startEnd);
     }
+
+
 }

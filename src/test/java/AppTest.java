@@ -239,6 +239,7 @@ public class AppTest {
 
 
     }
+
     @Test
     public void verifyScheduleByOpenRequest(){
 
@@ -262,6 +263,8 @@ public class AppTest {
         assertThat(this.controller.getRequestsByStatus(Status.SCHEDULED).isEmpty(),is(false));
         assertThat(this.controller.getRequestsByStatus(Status.SCHEDULED).get(0).getSubstituteId(),
                 is(testSubstitute.getId()));
+
+
 
     }
 }
