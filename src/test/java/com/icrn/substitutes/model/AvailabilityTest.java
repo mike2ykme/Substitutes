@@ -31,7 +31,11 @@ public class AvailabilityTest {
 
     @Test
     public void testIsAvailable(){
-        assertThat(this.availability.isAvailable(LocalDateTime.now(),LocalDateTime.now()),is(true));
+
+        LocalDateTime notHolidayStart = LocalDateTime.of(2018,4,5,9,0);
+        LocalDateTime notHolidayEnd = LocalDateTime.of(2018,4,5,17,0);
+
+        assertThat(this.availability.isAvailable(notHolidayStart,notHolidayEnd),is(true));
     }
     @Test(expected = RuntimeException.class)
     public void testExceptionForDifferentDates(){

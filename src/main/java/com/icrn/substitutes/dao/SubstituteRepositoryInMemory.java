@@ -1,6 +1,8 @@
 package com.icrn.substitutes.dao;
 
+import com.icrn.substitutes.model.Request;
 import com.icrn.substitutes.model.Substitute;
+import com.icrn.substitutes.Exceptions.SchedulingException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,14 +13,22 @@ import java.util.stream.Collectors;
 
 public class SubstituteRepositoryInMemory implements SubstituteRepository {
 
-    private Map<Long,Substitute> substituteMap = new ConcurrentHashMap<>();
+    private Map<Long,Substitute> substituteMap;
+
+    public SubstituteRepositoryInMemory(Map<Long, Substitute> substituteMap) {
+        this.substituteMap = substituteMap;
+    }
+
+    public SubstituteRepositoryInMemory() {
+        this.substituteMap  = new ConcurrentHashMap<>();
+    }
 
     @Override
     public List<Substitute> getSubstitutesAvailableForTime(LocalDateTime start, LocalDateTime end) {
         return substituteMap.entrySet()
                 .stream()
 //                .filter(entry -> entry.getValue().avaiableAtStart(start) && entry.getValue().availableUntilEnd(end))
-                .filter(entry -> entry.getValue().isAvailableOn(start,end))
+                .filter(entry -> entry.getValue().isAvailable(start,end))
                 .map(entry -> entry.getValue())
                 .collect(Collectors.toList());
     }
@@ -34,7 +44,26 @@ public class SubstituteRepositoryInMemory implements SubstituteRepository {
     public Substitute addSubstitute(Substitute sub) {
         if (sub.getId() == 0)
             sub.setId(Math.abs(new Random().nextLong()));
-        return this.substituteMap.put(sub.getId(),sub);
+        this.substituteMap.put(sub.getId(),sub);
+        return sub;
 
+    }
+
+    @Override
+    public Substitute getSubstituteById(long id) {
+        return this.substituteMap.get(id);
+    }
+
+    @Override
+    synchronized public Request scheduleSubstitute(Request request) throws SchedulingException {
+        if (request.getSubstituteId() == 0)
+            throw new IllegalArgumentException("Substitute ID is empty in request");
+
+        Substitute sub = this.substituteMap.get(request.getSubstituteId());
+        if(sub.isAvailable(request.getStartTime(),request.getEndTime())){
+            sub.schedule(request);
+            return request;
+        }
+        throw new SchedulingException("Unable to schedule Substitute for scheduled time");
     }
 }
