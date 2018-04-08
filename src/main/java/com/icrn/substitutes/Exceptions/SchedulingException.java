@@ -7,4 +7,7 @@ public class SchedulingException extends Exception {
     public SchedulingException(){
         super();
     }
+    public SchedulingException(Exception e){
+        super(e);
+    }
 }

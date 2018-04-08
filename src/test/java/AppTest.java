@@ -12,6 +12,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 import com.icrn.substitutes.model.enumerations.Status;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import static org.hamcrest.CoreMatchers.*;
@@ -129,13 +130,20 @@ public class AppTest {
 
     }
     @Test
+    public void getAllUsersTest(){
+        assertThat(this.controller.getAllUsers(),is(not(nullValue())));
+        this.controller.saveUser(this.testUser);
+        assertThat(this.controller.getUserById(testUser.getId()).get(),is(this.testUser));
+        assertThat(this.controller.getAllUsers(),hasItem(testUser));
+    }
+    @Test
     public void getAvailableOnDateEmpty(){
         LocalDateTime ldtNow = LocalDateTime.now();
         assertThat(controller.getSubstitutesAvailableOnDateTime(ldtNow,ldtNow), is(not(nullValue())));
 
     }
     @Test
-    public void getAllSunbstitutesNotNull(){
+    public void getAllSubstitutesNotNull(){
         assertThat(this.controller.getAllSubstitutes(),is(not(nullValue())));
     }
     @Test
@@ -239,10 +247,15 @@ public class AppTest {
 
 
     }
-
     @Test
     public void verifyScheduleByOpenRequest(){
 
+        this.testRequest.setSubstituteId(this.testSubstitute.getId());
+
+        /*
+         * Using method for trying exception from the below resource
+         * https://memorynotfound.com/junit-exception-testing/
+         */
         this.controller.saveRequest(this.testRequest);
         this.controller.saveSubstitute(this.testSubstitute);
         this.controller.saveUser(this.testUser);
@@ -256,15 +269,65 @@ public class AppTest {
         Substitute substitute = this.controller.getSubstitutesAvailableOnDateTime(
                 testNotHolidayStart,testNotHolidayEnd).get(0);
         try {
-            assertThat(this.controller.scheduleSubstitute(request,substitute).getStatus(),is(Status.SCHEDULED));
+            Request returnedRequest = this.controller.scheduleSubstitute(request);
+            assertThat(returnedRequest.getStatus(),is(Status.SCHEDULED));
+            assertThat(returnedRequest.getRequestId(),is(request.getRequestId()));
+            assertThat(this.controller.getSubstituteById(returnedRequest.getSubstituteId()).get().getAllRequestIds(),
+                    hasItem(returnedRequest.getRequestId()));
         }catch (SchedulingException e){
             fail(e.getMessage());
         }
         assertThat(this.controller.getRequestsByStatus(Status.SCHEDULED).isEmpty(),is(false));
         assertThat(this.controller.getRequestsByStatus(Status.SCHEDULED).get(0).getSubstituteId(),
                 is(testSubstitute.getId()));
+    }
+    @Test
+    public void getSubstituteByIdTest(){
+        this.controller.saveSubstitute(this.testSubstitute);
+        assertThat(this.controller.getSubstituteById(this.testSubstitute.getId()).get().getId(),is(this.testSubstitute.getId()));
+    }
+    @Test
+    public void updateExistingScheduledRequest(){
+        this.testRequest.setSubstituteId(this.testSubstitute.getId());
+        Request returnedRequest = this.controller.saveRequest(this.testRequest);
+        this.controller.saveSubstitute(this.testSubstitute);
+        this.controller.saveUser(this.testUser);
 
 
+        try {
+            returnedRequest = this.controller.scheduleSubstitute(returnedRequest);
+        }catch (SchedulingException e){
+            fail(e.getMessage());
+        }
+        assertThat(this.testRequest.getRequestId(), is(returnedRequest.getRequestId()));
+
+        try {
+            returnedRequest = this.controller.cancelRequest(returnedRequest.getRequestId());
+            assertThat(this.controller.getRequestsByStatus(Status.CANCELLED).isEmpty(),is(false));
+            assertThat(this.controller.getRequestsByStatus(Status.SCHEDULED).isEmpty(),is(true));
+
+
+        }catch (SchedulingException e){
+            fail(e.getMessage());
+        }
+
+        assertThat(this.controller.getSubstitutesAvailableOnDateTime(
+                returnedRequest.getStartTime(),returnedRequest.getEndTime()).isEmpty(),
+                is(false));
+
+        try {
+            returnedRequest = this.controller.scheduleSubstitute(returnedRequest);
+            assertThat(this.controller.getSubstitutesAvailableOnDateTime(
+                    returnedRequest.getStartTime(),returnedRequest.getEndTime()).isEmpty(),
+                    is(true));
+            assertThat(this.controller.getRequestsByStatus(Status.CANCELLED).isEmpty(),is(true));
+            assertThat(this.controller.getRequestsByStatus(Status.SCHEDULED).isEmpty(),is(false));
+            returnedRequest = this.controller.completeRequest(returnedRequest.getRequestId());
+            assertThat(this.controller.getRequestsByStatus(Status.OPEN).isEmpty(), is(true));
+            assertThat(this.controller.getRequestsByStatus(Status.COMPLETED),hasItem(returnedRequest));
+        }catch (SchedulingException e){
+            fail(e.getMessage());
+        }
 
     }
 }

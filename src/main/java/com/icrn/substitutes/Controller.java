@@ -26,10 +26,12 @@ public class Controller {
         this.substituteRepo = substituteRepo;
         this.userRepository = userRepository;
     }
+
+
     public List<Request> getAllRequests(){
         return this.requestRepo.getAllRequests();
     }
-    public Request saveRequest(Request request) {
+    public Request saveRequest(Request request){
         return this.requestRepo.saveRequest(request);
     }
     public List<Request> getRequestByRequestorId(long userId) {
@@ -38,6 +40,10 @@ public class Controller {
     public Optional<Request> getRequestByRequestId(long requestId) {
         return this.requestRepo.getRequestById(requestId);
     }
+    public List<Request> getRequestsByStatus(Status status) {
+        return this.requestRepo.getAllRequestsByStatus(status);
+    }
+
     public List<Substitute> getSubstitutesAvailableOnDateTime(LocalDateTime start,LocalDateTime end) {
         return this.substituteRepo.getSubstitutesAvailableForTime(start,end);
     }
@@ -47,34 +53,67 @@ public class Controller {
     public Substitute saveSubstitute(Substitute sub) {
         return this.substituteRepo.addSubstitute(sub);
     }
-    public Request scheduleSubstitute(User user, Substitute substitute, LocalDateTime start,
-                                      LocalDateTime end) throws SchedulingException {
-            Request request = new Request();
-            request.setStatus(Status.SCHEDULED);
-            request.setRequestorId(user.getId());
-            request.setSubstituteId(substitute.getId());
-            request.setStartTime(start);
-            request.setEndTime(end);
-            this.substituteRepo.scheduleSubstitute(request);
-            this.requestRepo.saveRequest(request);
-            return request;
+    public Optional<Substitute> getSubstituteById(long id) {
+        return this.substituteRepo.getSubstituteById(id);
     }
-    public List<Request> getRequestsByStatus(Status status) {
-        return this.requestRepo.getAllRequestsByStatus(status);
-    }
-    public Request scheduleSubstitute(Request request, Substitute substitute) throws SchedulingException{
-        return scheduleSubstitute(
-                this.getUserById(request.getRequestorId())
-                        .orElseThrow(() -> new SchedulingException("Unable to find user by User Id")),
-                substitute,
-                request.getStartTime(),
-                request.getEndTime()
-        );
-    }
-    private Optional<User> getUserById(long userId) {
+
+    public Optional<User> getUserById(long userId) {
         return this.userRepository.getUserById(userId);
     }
     public User saveUser(User user) {
         return this.userRepository.saveUser(user);
+    }
+    public List<User> getAllUsers(){
+        return this.userRepository.getAllusers();
+    }
+
+    public Request scheduleSubstitute(Request request) throws SchedulingException{
+        if (request.getSubstituteId() == 0 ||
+                request.getRequestorId() == 0 ||
+                request.getStartTime() == null ||
+                request.getEndTime() == null)
+            throw new IllegalArgumentException("Only RequestId and status allowed to be 0/null");
+
+        if (request.getRequestId() == 0) {
+                request = this.requestRepo.saveRequest(request);
+        }
+
+//        request = this.requestRepo.saveRequest(request);
+        if(this.substituteRepo.getSubstituteById(request.getSubstituteId()).orElseThrow(() -> new SchedulingException("Substitute Not found by SubstituteId"))
+                .isAvailable(request.getStartTime(),request.getEndTime())) {
+            this.substituteRepo.scheduleSubstitute(request);
+            request.setStatus(Status.SCHEDULED);
+            return this.requestRepo.saveRequest(request);
+        }
+        return null;
+
+    }
+    public Request scheduleSubstitute(User user, Substitute substitute, LocalDateTime start,
+                                      LocalDateTime end) throws SchedulingException {
+
+        Request request = this.requestRepo.saveRequest(new Request());
+        request.setStatus(Status.SCHEDULED);
+        request.setRequestorId(user.getId());
+        request.setSubstituteId(substitute.getId());
+        request.setStartTime(start);
+        request.setEndTime(end);
+        this.substituteRepo.scheduleSubstitute(request);
+        this.requestRepo.saveRequest(request);
+        return request;
+    }
+    public Request cancelRequest(long requestId) throws  SchedulingException{
+        Request request = this.getRequestByRequestId(requestId)
+                            .orElseThrow(() -> new SchedulingException("Request does not exist"));
+        request = this.substituteRepo.getSubstituteById(request.getSubstituteId())
+                            .orElseThrow(() -> new SchedulingException("Substitute does not exist"))
+                .cancelRequest(request);
+        request.setStatus(Status.CANCELLED);
+        return this.requestRepo.saveRequest(request);
+    }
+    public Request completeRequest(long requestId) throws  SchedulingException {
+        Request request = this.getRequestByRequestId(requestId)
+                .orElseThrow(() -> new SchedulingException("Request does not exist"));
+        request.setStatus(Status.COMPLETED);
+        return this.saveRequest(request);
     }
 }

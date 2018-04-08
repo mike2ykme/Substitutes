@@ -6,6 +6,7 @@ import com.icrn.substitutes.Exceptions.SchedulingException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface SubstituteRepository {
     List<Substitute> getSubstitutesAvailableForTime(LocalDateTime start, LocalDateTime end);
@@ -13,7 +14,7 @@ public interface SubstituteRepository {
 
     Substitute addSubstitute(Substitute sub);
 
-    Substitute getSubstituteById(long id);
+    Optional<Substitute> getSubstituteById(long id);
 
     Request scheduleSubstitute(Request request) throws SchedulingException;
 }

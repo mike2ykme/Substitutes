@@ -3,10 +3,10 @@ package com.icrn.substitutes.model;
 import lombok.Data;
 
 @Data
-public class User {
+public class User implements UserInterface {
     private long id;
-    private long name;
-    private long contactNumber;
-    private long address;
+    private String name;
+    private String contactNumber;
+    private String address;
 
 }

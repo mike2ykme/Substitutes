@@ -7,6 +7,7 @@ import com.icrn.substitutes.Exceptions.SchedulingException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -50,14 +51,16 @@ public class SubstituteRepositoryInMemory implements SubstituteRepository {
     }
 
     @Override
-    public Substitute getSubstituteById(long id) {
-        return this.substituteMap.get(id);
+    public Optional<Substitute> getSubstituteById(long id) {
+        return Optional.ofNullable(this.substituteMap.get(id));
     }
 
     @Override
     synchronized public Request scheduleSubstitute(Request request) throws SchedulingException {
-        if (request.getSubstituteId() == 0)
+        if (request.getSubstituteId() == 0 )
             throw new IllegalArgumentException("Substitute ID is empty in request");
+        if (request.getRequestId() == 0)
+            throw new IllegalArgumentException("Request Id is empty in request");
 
         Substitute sub = this.substituteMap.get(request.getSubstituteId());
         if(sub.isAvailable(request.getStartTime(),request.getEndTime())){

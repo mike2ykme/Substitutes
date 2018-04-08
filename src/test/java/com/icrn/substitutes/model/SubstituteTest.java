@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class SubstituteTest {
 
@@ -35,7 +36,7 @@ public class SubstituteTest {
         this.availabilitySet.addDay(LocalDate.of(2011,11,11));
 
         sub = new Substitute(1234567890l,"Name","123456789","123 Fake Street",
-                availabilitySet,this.availability,new AvailabilitySet(), new HashMap<Long,Request>());
+                availabilitySet,this.availability,new AvailabilitySet(), new HashSet<Long>());
     }
     @Test
     public void testIsAvailableFor(){
