@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Substitutes:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Substitutes_jar</output-path>
+    <root id="archive" name="Substitutes.jar">
+      <element id="module-output" name="Substitutes" />
+    </root>
+  </artifact>
+</component>
