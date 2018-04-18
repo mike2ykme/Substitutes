@@ -1,12 +1,12 @@
 package com.icrn.substitutes;
 
+import com.icrn.substitutes.Exceptions.SchedulingException;
 import com.icrn.substitutes.dao.RequestRepository;
 import com.icrn.substitutes.dao.SubstituteRepository;
 import com.icrn.substitutes.dao.UserRepository;
 import com.icrn.substitutes.model.Request;
-import com.icrn.substitutes.Exceptions.SchedulingException;
 import com.icrn.substitutes.model.Substitute;
-import com.icrn.substitutes.model.User;
+import com.icrn.substitutes.model.UserInterface;
 import com.icrn.substitutes.model.enumerations.Status;
 
 import java.time.LocalDateTime;
@@ -57,13 +57,13 @@ public class Controller {
         return this.substituteRepo.getSubstituteById(id);
     }
 
-    public Optional<User> getUserById(long userId) {
+    public Optional<UserInterface> getUserById(long userId) {
         return this.userRepository.getUserById(userId);
     }
-    public User saveUser(User user) {
+    public UserInterface saveUser(UserInterface user) {
         return this.userRepository.saveUser(user);
     }
-    public List<User> getAllUsers(){
+    public List<UserInterface> getAllUsers(){
         return this.userRepository.getAllusers();
     }
 
@@ -88,7 +88,7 @@ public class Controller {
         return null;
 
     }
-    public Request scheduleSubstitute(User user, Substitute substitute, LocalDateTime start,
+    public Request scheduleSubstitute(UserInterface user, Substitute substitute, LocalDateTime start,
                                       LocalDateTime end) throws SchedulingException {
 
         Request request = this.requestRepo.saveRequest(new Request());

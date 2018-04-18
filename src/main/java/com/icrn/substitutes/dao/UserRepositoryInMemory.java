@@ -1,6 +1,6 @@
 package com.icrn.substitutes.dao;
 
-import com.icrn.substitutes.model.User;
+import com.icrn.substitutes.model.UserInterface;
 
 import java.util.List;
 import java.util.Map;
@@ -10,18 +10,18 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class UserRepositoryInMemory implements UserRepository {
-    private Map<Long,User> userMap;
+    private Map<Long,UserInterface> userMap;
 
     public UserRepositoryInMemory() {
          this.userMap = new ConcurrentHashMap<>();
     }
 
-    public UserRepositoryInMemory(Map<Long, User> userMap) {
+    public UserRepositoryInMemory(Map<Long, UserInterface> userMap) {
         this.userMap = userMap;
     }
 
     @Override
-    public Optional<User> getUserById(long userId) {
+    public Optional<UserInterface> getUserById(long userId) {
         return this.userMap.entrySet().stream()
                 .filter(entry -> entry.getValue().getId() == userId)
                 .map(Map.Entry::getValue)
@@ -29,7 +29,7 @@ public class UserRepositoryInMemory implements UserRepository {
     }
 
     @Override
-    public User saveUser(User user) {
+    public UserInterface saveUser(UserInterface user) {
         if (user.getId() == 0)
             user.setId(Math.abs(new Random().nextLong()));
         this.userMap.put(user.getId(),user);
@@ -37,7 +37,7 @@ public class UserRepositoryInMemory implements UserRepository {
     }
 
     @Override
-    public List<User> getAllusers() {
+    public List<UserInterface> getAllusers() {
         return this.userMap.entrySet().stream()
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList());

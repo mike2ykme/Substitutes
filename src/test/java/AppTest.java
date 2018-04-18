@@ -28,7 +28,7 @@ public class AppTest {
     AvailabilitySet testAvailabilitySet;
     Availability testAvailability;
     Substitute testSubstitute;
-    User testUser;
+    UserInterface testUser;
 
     @Before
     public void before(){
@@ -210,7 +210,7 @@ public class AppTest {
         sub.setRegularAvailability(availability);
         sub.setScheduledTimes(new AvailabilitySet());
 
-        User user = new User();
+        UserInterface user = new User();
         user.setId(1111111111L);
         //Add a substitute
         assertThat(this.controller.saveSubstitute(sub),is(not(nullValue())));

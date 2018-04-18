@@ -1,15 +1,15 @@
 package com.icrn.substitutes.dao;
 
-import com.icrn.substitutes.model.User;
+import com.icrn.substitutes.model.UserInterface;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository {
 
-    Optional<User> getUserById(long userId);
+    Optional<UserInterface> getUserById(long userId);
 
-    User saveUser(User user);
+    UserInterface saveUser(UserInterface user);
 
-    List<User> getAllusers();
+    List<UserInterface> getAllusers();
 }
